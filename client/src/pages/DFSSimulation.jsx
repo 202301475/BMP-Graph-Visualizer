@@ -1,8 +1,13 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import Navbar from "../components/Navbar";
 import GraphVisualization from "../components/GraphVisualization";
 import DFSExecutor  from "../utils/dfs";
+import ComponentsExecutor from "../utils/components";
+import CycleDetectionExecutor from "../utils/cycleDetection";
+import BipartiteExecutor from "../utils/bipartite";
+import TopologicalSortExecutor from "../utils/topologicalSort";
 import parseAdjList from "../utils/parseAdjList";
 
 const MAX_NODES = 15;
@@ -13,6 +18,7 @@ export default function DFSSimulation() {
   const adj = useMemo(() => parseAdjList(input), [input]);
   const nodes = useMemo(() => Object.keys(adj), [adj]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const [start, setStart] = useState(nodes[0] || "");
   const [dfsState, setDfsState] = useState({
@@ -25,6 +31,15 @@ export default function DFSSimulation() {
     backtracking: false,
   });
   const [isSimulating, setIsSimulating] = useState(false);
+
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizInputs, setQuizInputs] = useState({
+    components: "",
+    hasCycle: "",
+    isBipartite: "",
+    topoPossible: "",
+  });
+  const [quizResult, setQuizResult] = useState(null);
 
   const executorRef = useRef(null);
   const simulationIntervalRef = useRef(null);
@@ -41,6 +56,50 @@ export default function DFSSimulation() {
     executorRef.current = new DFSExecutor(adj, start);
     setDfsState(executorRef.current.getState());
   }, [input]);
+
+  const derivedProperties = useMemo(() => {
+    if (!nodes.length) {
+      return {
+        componentCount: 0,
+        hasCycle: false,
+        isBipartite: false,
+        hasTopoOrder: false,
+        topoOrder: [],
+      };
+    }
+
+    try {
+      const componentsExecutor = new ComponentsExecutor(adj);
+      const componentsState = componentsExecutor.runAll();
+
+      const cycleExecutor = new CycleDetectionExecutor(adj, nodes[0]);
+      const cycleState = cycleExecutor.runAll();
+
+      const bipartiteExecutor = new BipartiteExecutor(adj, nodes[0]);
+      const bipartiteState = bipartiteExecutor.runAll();
+
+      const topoExecutor = new TopologicalSortExecutor(adj);
+      const topoState = topoExecutor.runAll();
+
+      const hasTopoOrder = !topoState.hasCycle && topoState.result.length === nodes.length;
+
+      return {
+        componentCount: componentsState.componentCount,
+        hasCycle: cycleState.hasCycle,
+        isBipartite: bipartiteState.isBipartite,
+        hasTopoOrder,
+        topoOrder: topoState.result,
+      };
+    } catch (e) {
+      return {
+        componentCount: 0,
+        hasCycle: false,
+        isBipartite: false,
+        hasTopoOrder: false,
+        topoOrder: [],
+      };
+    }
+  }, [adj, nodes]);
 
   // Cleanup simulation on unmount
   useEffect(() => {
@@ -92,6 +151,48 @@ export default function DFSSimulation() {
         stopSimulation();
       }
     }, SIMULATION_DELAY);
+  }
+
+  function normalizeYesNo(value) {
+    const v = value.trim().toLowerCase();
+    if (!v) return null;
+    if (["yes", "y", "true", "1"].includes(v)) return true;
+    if (["no", "n", "false", "0"].includes(v)) return false;
+    return null;
+  }
+
+  function handleQuizChange(field, value) {
+    setQuizInputs((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleQuizSubmit(e) {
+    e.preventDefault();
+
+    const { componentCount, hasCycle, isBipartite, hasTopoOrder } = derivedProperties;
+
+    const userComponents = parseInt(quizInputs.components, 10);
+    const userHasCycle = normalizeYesNo(quizInputs.hasCycle);
+    const userIsBipartite = normalizeYesNo(quizInputs.isBipartite);
+    const userTopoPossible = normalizeYesNo(quizInputs.topoPossible);
+
+    setQuizResult({
+      components: {
+        isCorrect: !Number.isNaN(userComponents) && userComponents === componentCount,
+        expected: componentCount,
+      },
+      cycle: {
+        isCorrect: userHasCycle !== null && userHasCycle === hasCycle,
+        expected: hasCycle,
+      },
+      bipartite: {
+        isCorrect: userIsBipartite !== null && userIsBipartite === isBipartite,
+        expected: isBipartite,
+      },
+      topoPossible: {
+        isCorrect: userTopoPossible !== null && userTopoPossible === hasTopoOrder,
+        expected: hasTopoOrder,
+      },
+    });
   }
 
   return (
@@ -169,7 +270,159 @@ export default function DFSSimulation() {
                     {isSimulating ? "Stop" : "Start Simulation"}
                   </Button>
                 </div>
+                <Button
+                  type="button"
+                  onClick={() => setShowQuiz((prev) => !prev)}
+                  className="w-full mt-3"
+                  variant="secondary"
+                  disabled={!!error || !nodes.length}
+                >
+                  Let's Apply
+                </Button>
               </div>
+
+              {showQuiz && (
+                <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold mb-1">Let's Apply DFS</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Answer these questions using the current graph, then see how DFS-based algorithms help.
+                  </p>
+                  <form className="space-y-3" onSubmit={handleQuizSubmit}>
+                    <div className="space-y-1">
+                      <label className="block text-sm font-medium">
+                        1. How many connected components does this graph have?
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        className="w-full p-2 rounded bg-background border border-border text-sm"
+                        value={quizInputs.components}
+                        onChange={(e) => handleQuizChange("components", e.target.value)}
+                      />
+                      {quizResult && (
+                        <p className={`text-xs mt-1 ${quizResult.components.isCorrect ? "text-green-600" : "text-red-600"}`}>
+                          {quizResult.components.isCorrect
+                            ? "Correct! DFS from every unvisited node lets us count each connected component."
+                            : `Not quite. This graph has ${derivedProperties.componentCount} component(s).`}
+                        </p>
+                      )}
+                      {quizResult && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => navigate("/components")}
+                        >
+                          View Components Simulation
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-medium">
+                        2. Does this graph contain a cycle? (yes / no)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 rounded bg-background border border-border text-sm"
+                        value={quizInputs.hasCycle}
+                        onChange={(e) => handleQuizChange("hasCycle", e.target.value)}
+                      />
+                      {quizResult && (
+                        <p className={`text-xs mt-1 ${quizResult.cycle.isCorrect ? "text-green-600" : "text-red-600"}`}>
+                          {quizResult.cycle.isCorrect
+                            ? "Correct! DFS can detect a back edge to an ancestor, which indicates a cycle."
+                            : derivedProperties.hasCycle
+                              ? "This graph DOES contain a cycle (DFS finds an edge to a previously visited non-parent vertex)."
+                              : "This graph is acyclic (DFS never finds such a back edge)."}
+                        </p>
+                      )}
+                      {quizResult && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => navigate("/cycle-detection")}
+                        >
+                          View Cycle Detection Simulation
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-medium">
+                        3. Is this graph bipartite? (yes / no)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 rounded bg-background border border-border text-sm"
+                        value={quizInputs.isBipartite}
+                        onChange={(e) => handleQuizChange("isBipartite", e.target.value)}
+                      />
+                      {quizResult && (
+                        <p className={`text-xs mt-1 ${quizResult.bipartite.isCorrect ? "text-green-600" : "text-red-600"}`}>
+                          {quizResult.bipartite.isCorrect
+                            ? "Correct! DFS (or BFS) can 2-color the graph and check for any same-color edge."
+                            : derivedProperties.isBipartite
+                              ? "This graph IS bipartite (it can be colored with two colors without conflict)."
+                              : "This graph is NOT bipartite (any 2-coloring leads to a conflicting edge)."}
+                        </p>
+                      )}
+                      {quizResult && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => navigate("/bipartite")}
+                        >
+                          View Bipartite Simulation
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-medium">
+                        4. Is a valid topological ordering possible for this graph? (yes / no)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 rounded bg-background border border-border text-sm"
+                        value={quizInputs.topoPossible}
+                        onChange={(e) => handleQuizChange("topoPossible", e.target.value)}
+                      />
+                      {quizResult && (
+                        <p className={`text-xs mt-1 ${quizResult.topoPossible.isCorrect ? "text-green-600" : "text-red-600"}`}>
+                          {quizResult.topoPossible.isCorrect
+                            ? derivedProperties.hasTopoOrder
+                              ? `Correct! A topological order exists; one possible order is [${derivedProperties.topoOrder.join(", ")}].`
+                              : "Correct! Because the directed graph has a cycle, no topological ordering is possible."
+                            : derivedProperties.hasTopoOrder
+                              ? `A topological order IS possible; for example: [${derivedProperties.topoOrder.join(", ")}].`
+                              : "No topological ordering exists here because the directed graph contains a cycle."}
+                        </p>
+                      )}
+                      {quizResult && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => navigate("/topological-sort")}
+                        >
+                          View Topological Sort Simulation
+                        </Button>
+                      )}
+                    </div>
+
+                    <Button type="submit" className="w-full mt-2">
+                      Check Answers
+                    </Button>
+                  </form>
+                </div>
+              )}
 
               <div className="bg-card border border-border rounded-lg p-4">
                 <h4 className="font-semibold mb-2">Recursion Stack</h4>
