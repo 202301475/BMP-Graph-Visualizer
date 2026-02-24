@@ -75,13 +75,13 @@ export default class CycleDetectionExecutor {
                 if (!this.queue.includes(neighbor)) {
                     this.queue.push(neighbor);
                     this.parent[neighbor] = this.currentNode;
-                    this.log.push(`  → Enqueued ${neighbor} (parent: ${this.currentNode})`);
+                    this.log.push(`  Enqueued ${neighbor} (parent: ${this.currentNode})`);
                 }
             } else if (this.parent[this.currentNode] !== neighbor) {
                 // Visited neighbor that's not the parent - CYCLE FOUND!
                 this.hasCycle = true;
                 this.cycleEdge = { from: this.currentNode, to: neighbor };
-                this.log.push(`  CYCLE: ${this.currentNode} → ${neighbor} (already visited, not parent)`);
+                this.log.push(`  CYCLE: ${this.currentNode} to ${neighbor} (already visited, not parent)`);
                 this.done = true;
                 return this.getState();
             } else {

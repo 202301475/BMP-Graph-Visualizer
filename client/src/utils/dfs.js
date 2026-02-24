@@ -63,7 +63,7 @@ export default class DFSExecutor {
                 this.recursionStack.push(neighbor);
                 this.neighborIndices[this.currentNode] = i + 1;
                 this.neighborIndices[neighbor] = 0;
-                this.log.push(`  → Exploring ${neighbor} from ${this.currentNode}`);
+                this.log.push(`  Exploring ${neighbor} from ${this.currentNode}`);
                 this.currentNeighbors = [neighbor]; // Highlight the edge we're exploring
                 this.backtracking = false;
                 foundUnvisited = true;
@@ -74,7 +74,7 @@ export default class DFSExecutor {
         if (!foundUnvisited) {
             // No more unvisited neighbors, backtrack
             const poppedNode = this.recursionStack.pop();
-            this.log.push(`⬅ Backtracking from ${poppedNode}`);
+            this.log.push(`Backtracking from ${poppedNode}`);
             this.backtracking = true;
 
             // Update current node and neighbors for visualization

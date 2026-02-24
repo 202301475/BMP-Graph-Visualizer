@@ -65,7 +65,7 @@ export default class ComponentsExecutor {
         for (let neighbor of neighbors) {
             if (!this.visited.has(neighbor) && !this.queue.includes(neighbor)) {
                 this.queue.push(neighbor);
-                this.log.push(`    → Enqueued ${neighbor}`);
+                this.log.push(`    Enqueued ${neighbor}`);
             }
         }
 

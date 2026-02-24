@@ -197,7 +197,7 @@ export default function CycleDetectionSimulation() {
                 </p>
                 {cycleState.done && cycleState.hasCycle && cycleState.cycleEdge && (
                   <p className="text-sm text-red-600 mt-2">
-                    Cycle edge: {cycleState.cycleEdge.from} ↔ {cycleState.cycleEdge.to}
+                    Cycle edge: {cycleState.cycleEdge.from} {'<->'} {cycleState.cycleEdge.to}
                   </p>
                 )}
               </div>

@@ -53,25 +53,32 @@ export default function GraphVisualization({
     const processed = new Set();
     
     Object.entries(adjacencyList).forEach(([from, neighbors]) => {
-      neighbors.forEach((to) => {
+      neighbors.forEach((neighbor) => {
+        // Handle both weighted {node, weight} and unweighted string formats
+        const to = typeof neighbor === 'string' ? neighbor : neighbor.node;
+        const weight = typeof neighbor === 'object' ? neighbor.weight : null;
+        
         const edgeKey = `${from}->${to}`;
         const reverseKey = `${to}->${from}`;
         
         if (processed.has(edgeKey)) return;
         
         // Check if reverse edge exists (bidirectional)
-        const isBidirectional = adjacencyList[to]?.includes(from);
+        const reverseNeighbors = adjacencyList[to] || [];
+        const isBidirectional = reverseNeighbors.some(n => 
+          (typeof n === 'string' ? n : n.node) === from
+        );
         
         if (isBidirectional) {
           // For bidirectional, only add once (avoid duplicates)
           if (!processed.has(reverseKey)) {
-            edgeSet.push({ from, to, bidirectional: true });
+            edgeSet.push({ from, to, weight, bidirectional: true });
             processed.add(edgeKey);
             processed.add(reverseKey);
           }
         } else {
           // Unidirectional edge
-          edgeSet.push({ from, to, bidirectional: false });
+          edgeSet.push({ from, to, weight, bidirectional: false });
           processed.add(edgeKey);
         }
       });
@@ -160,6 +167,50 @@ export default function GraphVisualization({
                   strokeOpacity={1}
                   markerEnd={edge.bidirectional ? "" : (isActiveEdge ? "url(#arrowhead-active)" : "url(#arrowhead)")}
                 />
+                {/* Edge weight label */}
+                {edge.weight !== null && (
+                  <text
+                    x={(x1 + x2) / 2}
+                    y={(y1 + y2) / 2}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="#ffffff"
+                    fontSize="12"
+                    fontWeight="700"
+                    className="pointer-events-none"
+                  >
+                    <tspan
+                      dy="-8"
+                      className="bg-background"
+                    >
+                      {edge.weight}
+                    </tspan>
+                  </text>
+                )}
+                {edge.weight !== null && (
+                  <circle
+                    cx={(x1 + x2) / 2}
+                    cy={(y1 + y2) / 2 - 8}
+                    r="12"
+                    fill={isActiveEdge ? "#f59e0b" : "#3b82f6"}
+                    stroke={isActiveEdge ? "#ea580c" : "#2563eb"}
+                    strokeWidth="2"
+                  />
+                )}
+                {edge.weight !== null && (
+                  <text
+                    x={(x1 + x2) / 2}
+                    y={(y1 + y2) / 2 - 8}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="#ffffff"
+                    fontSize="11"
+                    fontWeight="700"
+                    className="pointer-events-none"
+                  >
+                    {edge.weight}
+                  </text>
+                )}
               </g>
             );
           })}

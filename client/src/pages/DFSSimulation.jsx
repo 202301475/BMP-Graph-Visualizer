@@ -201,9 +201,9 @@ export default function DFSSimulation() {
                       <div
                         key={i}
                         className={`py-1 ${
-                          entry.startsWith("  →")
+                          entry.startsWith("  Exploring")
                             ? "text-muted-foreground pl-4"
-                            : entry.startsWith("⬅")
+                            : entry.startsWith("Backtracking")
                             ? "text-amber-600 font-semibold"
                             : "text-foreground font-semibold"
                         }`}

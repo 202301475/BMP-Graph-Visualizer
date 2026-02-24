@@ -7,6 +7,9 @@ import TopologicalSort from './pages/TopologicalSort.jsx'
 import BipartiteSimulation from './pages/BipartiteSimulation.jsx'
 import ComponentsSimulation from './pages/ComponentsSimulation.jsx'
 import CycleDetectionSimulation from './pages/CycleDetectionSimulation.jsx'
+import DijkstraSimulation from './pages/DijkstraSimulation.jsx'
+import BellmanFordSimulation from './pages/BellmanFordSimulation.jsx'
+import FloydWarshallSimulation from './pages/FloydWarshallSimulation.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 function App() {
@@ -21,6 +24,9 @@ function App() {
         <Route path="/bipartite" element={<BipartiteSimulation/>} />
         <Route path="/components" element={<ComponentsSimulation/>} />
         <Route path="/cycle-detection" element={<CycleDetectionSimulation/>} />
+        <Route path="/dijkstra" element={<DijkstraSimulation/>} />
+        <Route path="/bellman-ford" element={<BellmanFordSimulation/>} />
+        <Route path="/floyd-warshall" element={<FloydWarshallSimulation/>} />
         <Route path="*" element={<NotFound/>} />
       </Routes>
     </>

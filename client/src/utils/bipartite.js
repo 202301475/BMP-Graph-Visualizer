@@ -72,7 +72,7 @@ export default class BipartiteExecutor {
                 this.color[neighbor] = oppositeColor;
                 this.queue.push(neighbor);
                 const neighborColorName = oppositeColor === 0 ? "RED" : "BLACK";
-                this.log.push(`  → ${neighbor} colored ${neighborColorName}`);
+                this.log.push(`  ${neighbor} colored ${neighborColorName}`);
             } else if (this.color[neighbor] === currentColor) {
                 // Same color as current node - NOT BIPARTITE!
                 this.isBipartite = false;

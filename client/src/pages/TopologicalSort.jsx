@@ -209,7 +209,7 @@ export default function TopologicalSort() {
                           {node}
                         </div>
                         {i < topoState.result.length - 1 && (
-                          <span className="text-muted-foreground">→</span>
+                          <span className="text-muted-foreground">-&gt;</span>
                         )}
                       </div>
                     ))

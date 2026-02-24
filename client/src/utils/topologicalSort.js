@@ -125,7 +125,7 @@ export default class TopologicalSortExecutor {
     this.result.push(current.node);
 
     this.log.push(`Popped ${current.node} from heap (indegree: ${current.indegree})`);
-    this.log.push(`  → Result: [${this.result.join(', ')}]`);
+    this.log.push(`  Result: [${this.result.join(', ')}]`);
 
     // Get neighbors for visualization
     const neighbors = this.adj[current.node] || [];
@@ -133,12 +133,12 @@ export default class TopologicalSortExecutor {
 
     // Reduce indegree of neighbors
     if (neighbors.length > 0) {
-      this.log.push(`  → Updating neighbors' indegrees:`);
+      this.log.push(`  Updating neighbors' indegrees:`);
       neighbors.forEach(neighbor => {
         const oldIndegree = this.indegree[neighbor];
         this.indegree[neighbor]--;
         this.indegreeUpdates[neighbor] = this.indegree[neighbor];
-        this.log.push(`     ${neighbor}: ${oldIndegree} → ${this.indegree[neighbor]}`);
+        this.log.push(`     ${neighbor}: ${oldIndegree} -> ${this.indegree[neighbor]}`);
 
         // If indegree becomes 0, add to heap
         if (this.indegree[neighbor] === 0) {

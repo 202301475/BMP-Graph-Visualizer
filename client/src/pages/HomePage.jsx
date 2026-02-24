@@ -53,22 +53,22 @@ export default function Home() {
       link: "/bellman-ford"
     },
     {
-      title: "Kruskal's Algorithm",
-      description: "Minimum spanning tree",
+      title: "Floyd-Warshall Algorithm",
+      description: "All-pairs shortest paths",
       content:
-        "Finds a minimum spanning tree for a connected weighted graph. Useful for network design and clustering problems.",
-      time: "O(E log E)",
-      space: "O(V)",
-      link: "/kruskal"
+        "Finds shortest paths between all pairs of vertices. Uses dynamic programming to efficiently compute distances in dense graphs.",
+      time: "O(V³)",
+      space: "O(V²)",
+      link: "/floyd-warshall"
     },
     {
-      title: "Prim's Algorithm",
-      description: "MST with priority queue",
+      title: "Topological Sort",
+      description: "Dependency ordering",
       content:
-        "Another approach to finding minimum spanning trees, growing the tree one vertex at a time. Efficient for dense graphs.",
-      time: "O(E log V)",
+        "Orders vertices in a directed acyclic graph so that for every edge from u to v, u comes before v. Essential for task scheduling.",
+      time: "O(V + E)",
       space: "O(V)",
-      link: "/prims"
+      link: "/topological-sort"
     },
   ];
 
