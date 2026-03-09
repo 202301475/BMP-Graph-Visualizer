@@ -308,9 +308,11 @@ export default function Home() {
               Start your journey into one of computer science's most powerful
               concepts
             </p>
+            <button onClick={() => navigate("/bfs")}>
             <Button size="lg" className="text-lg px-8">
               Begin Learning Now <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            </button>
           </div>
         </div>
       </section>

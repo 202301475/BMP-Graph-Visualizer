@@ -13,6 +13,8 @@ const ALGORITHMS = [
   { name: "Bipartite Graph Check", route: "/bipartite" },
   { name: "Connected Components", route: "/components" },
   { name: "Cycle Detection", route: "/cycle-detection" },
+  { name: "Prim's Algorithm", route: "/prims" },
+  { name: "Kruskal's Algorithm", route: "/kruskals" },
 ];
 
 export default function Navbar() {

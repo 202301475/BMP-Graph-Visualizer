@@ -35,6 +35,7 @@ export default function GraphVisualization({
   currentNeighbors = [],
   width = 600,
   height = 500,
+  mstEdges = [], // Array of MST edges {from, to, weight}
 }) {
   const nodes = useMemo(() => Object.keys(adjacencyList), [adjacencyList]);
   
@@ -128,6 +129,13 @@ export default function GraphVisualization({
               (currentNode === edge.from && currentNeighbors.includes(edge.to)) ||
               (currentNode === edge.to && currentNeighbors.includes(edge.from) && edge.bidirectional);
 
+            // Check if this edge is in the MST
+            const isMSTEdge = mstEdges.some(
+              mstEdge =>
+                (mstEdge.from === edge.from && mstEdge.to === edge.to) ||
+                (mstEdge.from === edge.to && mstEdge.to === edge.from)
+            );
+
             // Calculate edge endpoints accounting for node radius
             const dx = to.x - from.x;
             const dy = to.y - from.y;
@@ -144,14 +152,14 @@ export default function GraphVisualization({
 
             return (
               <g key={`${edge.from}-${edge.to}-${idx}`}>
-                {/* Highlight glow effect for active edges */}
-                {isActiveEdge && (
+                {/* Highlight glow effect for active or MST edges */}
+                {(isActiveEdge || isMSTEdge) && (
                   <line
                     x1={x1}
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#fbbf24"
+                    stroke={isMSTEdge ? "#a855f7" : "#fbbf24"}
                     strokeWidth={8}
                     strokeOpacity={0.3}
                   />
@@ -162,38 +170,19 @@ export default function GraphVisualization({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={isActiveEdge ? "#f59e0b" : "#64748b"}
-                  strokeWidth={isActiveEdge ? 4 : 2.5}
+                  stroke={isMSTEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#64748b"}
+                  strokeWidth={isMSTEdge ? 5 : isActiveEdge ? 4 : 2.5}
                   strokeOpacity={1}
                   markerEnd={edge.bidirectional ? "" : (isActiveEdge ? "url(#arrowhead-active)" : "url(#arrowhead)")}
                 />
                 {/* Edge weight label */}
                 {edge.weight !== null && (
-                  <text
-                    x={(x1 + x2) / 2}
-                    y={(y1 + y2) / 2}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#ffffff"
-                    fontSize="12"
-                    fontWeight="700"
-                    className="pointer-events-none"
-                  >
-                    <tspan
-                      dy="-8"
-                      className="bg-background"
-                    >
-                      {edge.weight}
-                    </tspan>
-                  </text>
-                )}
-                {edge.weight !== null && (
                   <circle
                     cx={(x1 + x2) / 2}
                     cy={(y1 + y2) / 2 - 8}
                     r="12"
-                    fill={isActiveEdge ? "#f59e0b" : "#3b82f6"}
-                    stroke={isActiveEdge ? "#ea580c" : "#2563eb"}
+                    fill={isMSTEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#3b82f6"}
+                    stroke={isMSTEdge ? "#9333ea" : isActiveEdge ? "#ea580c" : "#2563eb"}
                     strokeWidth="2"
                   />
                 )}
