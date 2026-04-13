@@ -154,9 +154,9 @@ export default function ComponentsSimulation() {
               </div>
 
               {/* Component Count Display */}
-              <div className="bg-blue-500 rounded-lg p-6 text-white">
+              <div className="bg-card border border-border rounded-lg p-6 text-green-800 font-extrabold">
                 <h4 className="text-sm font-medium opacity-90 mb-1">Total Components</h4>
-                <p className="text-3xl font-bold">{componentsState.componentCount}</p>
+                <p className="text-xl font-bold">{componentsState.componentCount}</p>
               </div>
 
               {/* Queue Display */}

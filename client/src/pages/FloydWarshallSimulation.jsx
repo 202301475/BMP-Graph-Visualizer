@@ -162,9 +162,9 @@ export default function FloydWarshallSimulation() {
               </div>
 
               {/* Current State */}
-              <div className="bg-blue-500 rounded-lg p-6 text-white">
+              <div className="bg-card border border-border rounded-lg p-6 text-green-800 font-extrabold">
                 <h4 className="text-sm font-medium opacity-90 mb-1">Intermediate Vertex (k)</h4>
-                <p className="text-3xl font-bold">
+                <p className="text-xl font-bold">
                   {floydWarshallState.currentK || 'Initializing'}
                 </p>
                 {floydWarshallState.currentI && (

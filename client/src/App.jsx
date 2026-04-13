@@ -13,6 +13,7 @@ import FloydWarshallSimulation from './pages/FloydWarshallSimulation.jsx'
 import PrimsSimulation from './pages/PrimsSimulation.jsx'
 import KruskalsSimulation from './pages/KruskalsSimulation.jsx'
 import FordFulkersonSimulation from './pages/FordFulkersonSimulation.jsx'
+import WhitneyTheoremSimulation from './pages/WhitneyTheoremSimulation.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/bellman-ford" element={<BellmanFordSimulation/>} />
         <Route path="/floyd-warshall" element={<FloydWarshallSimulation/>} />
         <Route path="/ford-fulkerson" element={<FordFulkersonSimulation/>} />
+        <Route path="/whitney-theorem" element={<WhitneyTheoremSimulation/>} />
         <Route path="/prims" element={<PrimsSimulation/>} />
         <Route path="/kruskals" element={<KruskalsSimulation/>} />
         <Route path="*" element={<NotFound/>} />

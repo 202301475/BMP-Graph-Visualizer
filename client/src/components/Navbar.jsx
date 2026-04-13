@@ -10,6 +10,7 @@ const ALGORITHMS = [
   { name: "Bellman-Ford Algorithm", route: "/bellman-ford" },
   { name: "Floyd-Warshall Algorithm", route: "/floyd-warshall" },
   { name: "Ford-Fulkerson Algorithm", route: "/ford-fulkerson" },
+  { name: "Whitney's Theorem (Connectivity)", route: "/whitney-theorem" },
   { name: "Topological Sort (Kahn's)", route: "/topological-sort" },
   { name: "Bipartite Graph Check", route: "/bipartite" },
   { name: "Connected Components", route: "/components" },

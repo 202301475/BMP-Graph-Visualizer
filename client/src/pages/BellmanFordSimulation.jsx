@@ -173,11 +173,11 @@ export default function BellmanFordSimulation() {
               </div>
 
               {/* Iteration Progress */}
-              <div className={`rounded-lg p-6 text-white ${bellmanFordState.hasNegativeCycle ? 'bg-red-500' : 'bg-blue-500'}`}>
+              <div className={`border border-border rounded-lg p-6 text-green-800 font-extrabold ${bellmanFordState.hasNegativeCycle ? 'bg-red-500' : 'bg-card'}`}>
                 <h4 className="text-sm font-medium opacity-90 mb-1">
                   {bellmanFordState.hasNegativeCycle ? 'Negative Cycle Detected!' : 'Iteration Progress'}
                 </h4>
-                <p className="text-3xl font-bold">
+                <p className="text-xl font-bold">
                   {bellmanFordState.currentIteration}/{bellmanFordState.maxIterations}
                 </p>
                 {bellmanFordState.currentEdge && (

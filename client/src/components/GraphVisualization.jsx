@@ -36,6 +36,8 @@ export default function GraphVisualization({
   width = 600,
   height = 500,
   mstEdges = [], // Array of MST edges {from, to, weight}
+  highlightedEdges = [], // Array of highlighted edges {from, to}
+  highlightedEdgeLabel = "Highlighted Edge",
 }) {
   const nodes = useMemo(() => Object.keys(adjacencyList), [adjacencyList]);
   
@@ -47,6 +49,9 @@ export default function GraphVisualization({
     () => calculateNodePositions(nodes, width, height),
     [nodes, width, height]
   );
+
+  const effectiveHighlightedEdges =
+    highlightedEdges.length > 0 ? highlightedEdges : mstEdges;
 
   // Build edge list with direction detection
   const edges = useMemo(() => {
@@ -130,10 +135,10 @@ export default function GraphVisualization({
               (currentNode === edge.to && currentNeighbors.includes(edge.from) && edge.bidirectional);
 
             // Check if this edge is in the MST
-            const isMSTEdge = mstEdges.some(
-              mstEdge =>
-                (mstEdge.from === edge.from && mstEdge.to === edge.to) ||
-                (mstEdge.from === edge.to && mstEdge.to === edge.from)
+            const isHighlightedEdge = effectiveHighlightedEdges.some(
+              highlightedEdge =>
+                (highlightedEdge.from === edge.from && highlightedEdge.to === edge.to) ||
+                (highlightedEdge.from === edge.to && highlightedEdge.to === edge.from)
             );
 
             // Calculate edge endpoints accounting for node radius
@@ -153,13 +158,13 @@ export default function GraphVisualization({
             return (
               <g key={`${edge.from}-${edge.to}-${idx}`}>
                 {/* Highlight glow effect for active or MST edges */}
-                {(isActiveEdge || isMSTEdge) && (
+                {(isActiveEdge || isHighlightedEdge) && (
                   <line
                     x1={x1}
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke={isMSTEdge ? "#a855f7" : "#fbbf24"}
+                    stroke={isHighlightedEdge ? "#a855f7" : "#fbbf24"}
                     strokeWidth={8}
                     strokeOpacity={0.3}
                   />
@@ -170,8 +175,8 @@ export default function GraphVisualization({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={isMSTEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#64748b"}
-                  strokeWidth={isMSTEdge ? 5 : isActiveEdge ? 4 : 2.5}
+                  stroke={isHighlightedEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#64748b"}
+                  strokeWidth={isHighlightedEdge ? 5 : isActiveEdge ? 4 : 2.5}
                   strokeOpacity={1}
                   markerEnd={edge.bidirectional ? "" : (isActiveEdge ? "url(#arrowhead-active)" : "url(#arrowhead)")}
                 />
@@ -181,8 +186,8 @@ export default function GraphVisualization({
                     cx={(x1 + x2) / 2}
                     cy={(y1 + y2) / 2 - 8}
                     r="12"
-                    fill={isMSTEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#3b82f6"}
-                    stroke={isMSTEdge ? "#9333ea" : isActiveEdge ? "#ea580c" : "#2563eb"}
+                    fill={isHighlightedEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#3b82f6"}
+                    stroke={isHighlightedEdge ? "#9333ea" : isActiveEdge ? "#ea580c" : "#2563eb"}
                     strokeWidth="2"
                   />
                 )}
@@ -308,6 +313,12 @@ export default function GraphVisualization({
           <div className="w-8 h-1 bg-amber-500"></div>
           <span className="font-medium">Active Edge</span>
         </div>
+        {effectiveHighlightedEdges.length > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-1 bg-purple-500"></div>
+            <span className="font-medium">{highlightedEdgeLabel}</span>
+          </div>
+        )}
       </div>
     </div>
   );
