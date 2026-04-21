@@ -99,6 +99,10 @@ export default function Home() {
     },
   ];
 
+  function openAlgorithmMenu() {
+    window.dispatchEvent(new CustomEvent("open-algorithms-menu"));
+  }
+
   return (
     <div className="min-h-screen bg-background">
         <Navbar />
@@ -122,14 +126,19 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="text-lg px-8 shadow-lg backdrop-blur-3xl hover:text-foreground">
-                Start Learning <ArrowRight className="ml-2 h-5 w-5" />
+              <Button
+                size="lg"
+                className="text-lg px-8 shadow-lg backdrop-blur-3xl hover:text-foreground"
+                onClick={() => navigate("/bfs")}
+              >
+                Start with BFS <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
 
               <Button
                 size="lg"
                 variant="outline"
                 className="text-lg px-8 bg-transparent border-black/20 border-2 backdrop-blur-3xl"
+                onClick={openAlgorithmMenu}
               >
                 View Algorithms
               </Button>
@@ -308,7 +317,7 @@ export default function Home() {
               Start your journey into one of computer science's most powerful
               concepts
             </p>
-            <button onClick={() => navigate("/bfs")}>
+            <button onClick={() => navigate("/dfs")}>
             <Button size="lg" className="text-lg px-8">
               Begin Learning Now <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

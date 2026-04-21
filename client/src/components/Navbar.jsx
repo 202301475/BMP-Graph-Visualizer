@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Home, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,7 @@ const ALGORITHMS = [
   { name: "Floyd-Warshall Algorithm", route: "/floyd-warshall" },
   { name: "Ford-Fulkerson Algorithm", route: "/ford-fulkerson" },
   { name: "Whitney's Theorem (Connectivity)", route: "/whitney-theorem" },
+  { name: "Whitney's Theorem (2-Connected)", route: "/whitney-2-connected" },
   { name: "Topological Sort (Kahn's)", route: "/topological-sort" },
   { name: "Bipartite Graph Check", route: "/bipartite" },
   { name: "Connected Components", route: "/components" },
@@ -21,6 +23,19 @@ const ALGORITHMS = [
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const algorithmsRef = useRef(null);
+
+  useEffect(() => {
+    function handleOpenMenu() {
+      if (algorithmsRef.current) {
+        algorithmsRef.current.open = true;
+        algorithmsRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+
+    window.addEventListener("open-algorithms-menu", handleOpenMenu);
+    return () => window.removeEventListener("open-algorithms-menu", handleOpenMenu);
+  }, []);
 
   return (
     <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl">
@@ -36,7 +51,7 @@ export default function Navbar() {
           />
 
           {/* Algorithms Dropdown */}
-          <details className="relative flex-1">
+          <details ref={algorithmsRef} className="relative flex-1">
             <summary
               className="flex items-center gap-2 px-4 py-2 rounded-full border
                          bg-background/60 cursor-pointer list-none"

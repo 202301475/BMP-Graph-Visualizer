@@ -38,6 +38,10 @@ export default function GraphVisualization({
   mstEdges = [], // Array of MST edges {from, to, weight}
   highlightedEdges = [], // Array of highlighted edges {from, to}
   highlightedEdgeLabel = "Highlighted Edge",
+  highlightedEdgeGroups = [], // Array of groups {label, color, edges}
+  highlightedNodes = [], // Array of node ids
+  highlightedNodeLabel = "Highlighted Nodes",
+  highlightedNodeColor = { fill: "#a855f7", stroke: "#9333ea", text: "#ffffff" },
 }) {
   const nodes = useMemo(() => Object.keys(adjacencyList), [adjacencyList]);
   
@@ -50,8 +54,10 @@ export default function GraphVisualization({
     [nodes, width, height]
   );
 
-  const effectiveHighlightedEdges =
-    highlightedEdges.length > 0 ? highlightedEdges : mstEdges;
+  const effectiveHighlightedEdges = highlightedEdges.length > 0 ? highlightedEdges : mstEdges;
+
+  const hasEdgeGroups = highlightedEdgeGroups && highlightedEdgeGroups.length > 0;
+  const hasHighlightedNodes = highlightedNodes && highlightedNodes.length > 0;
 
   // Build edge list with direction detection
   const edges = useMemo(() => {
@@ -135,11 +141,25 @@ export default function GraphVisualization({
               (currentNode === edge.to && currentNeighbors.includes(edge.from) && edge.bidirectional);
 
             // Check if this edge is in the MST
-            const isHighlightedEdge = effectiveHighlightedEdges.some(
-              highlightedEdge =>
-                (highlightedEdge.from === edge.from && highlightedEdge.to === edge.to) ||
-                (highlightedEdge.from === edge.to && highlightedEdge.to === edge.from)
-            );
+            const matchedGroup = hasEdgeGroups
+              ? highlightedEdgeGroups.find((group) =>
+                  (group.edges || []).some(
+                    (highlightedEdge) =>
+                      (highlightedEdge.from === edge.from && highlightedEdge.to === edge.to) ||
+                      (highlightedEdge.from === edge.to && highlightedEdge.to === edge.from)
+                  )
+                )
+              : null;
+
+            const isHighlightedEdge = matchedGroup
+              ? true
+              : effectiveHighlightedEdges.some(
+                  (highlightedEdge) =>
+                    (highlightedEdge.from === edge.from && highlightedEdge.to === edge.to) ||
+                    (highlightedEdge.from === edge.to && highlightedEdge.to === edge.from)
+                );
+
+            const highlightColor = matchedGroup?.color || "#a855f7";
 
             // Calculate edge endpoints accounting for node radius
             const dx = to.x - from.x;
@@ -164,7 +184,7 @@ export default function GraphVisualization({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke={isHighlightedEdge ? "#a855f7" : "#fbbf24"}
+                    stroke={isHighlightedEdge ? highlightColor : "#fbbf24"}
                     strokeWidth={8}
                     strokeOpacity={0.3}
                   />
@@ -175,7 +195,7 @@ export default function GraphVisualization({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={isHighlightedEdge ? "#a855f7" : isActiveEdge ? "#f59e0b" : "#64748b"}
+                  stroke={isHighlightedEdge ? highlightColor : isActiveEdge ? "#f59e0b" : "#64748b"}
                   strokeWidth={isHighlightedEdge ? 5 : isActiveEdge ? 4 : 2.5}
                   strokeOpacity={1}
                   markerEnd={edge.bidirectional ? "" : (isActiveEdge ? "url(#arrowhead-active)" : "url(#arrowhead)")}
@@ -220,6 +240,7 @@ export default function GraphVisualization({
             const isQueued = queuedNodes.includes(node);
             const isCurrent = currentNode === node;
             const isNeighbor = currentNeighbors.includes(node);
+            const isHighlighted = hasHighlightedNodes && highlightedNodes.includes(node);
 
             let fill, stroke, textFill;
 
@@ -233,6 +254,10 @@ export default function GraphVisualization({
               fill = "#fb923c";
               stroke = "#f97316";
               textFill = "#ffffff";
+            } else if (isHighlighted) {
+              fill = highlightedNodeColor.fill;
+              stroke = highlightedNodeColor.stroke;
+              textFill = highlightedNodeColor.text;
             } else if (isVisited) {
               // Visited nodes - GREEN
               fill = "#22c55e";
@@ -313,10 +338,26 @@ export default function GraphVisualization({
           <div className="w-8 h-1 bg-amber-500"></div>
           <span className="font-medium">Active Edge</span>
         </div>
-        {effectiveHighlightedEdges.length > 0 && (
+        {hasEdgeGroups
+          ? highlightedEdgeGroups.map((group) => (
+              <div key={group.label} className="flex items-center gap-2">
+                <div className="w-8 h-1" style={{ backgroundColor: group.color }}></div>
+                <span className="font-medium">{group.label}</span>
+              </div>
+            ))
+          : effectiveHighlightedEdges.length > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-1 bg-purple-500"></div>
+                <span className="font-medium">{highlightedEdgeLabel}</span>
+              </div>
+            )}
+        {hasHighlightedNodes && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-1 bg-purple-500"></div>
-            <span className="font-medium">{highlightedEdgeLabel}</span>
+            <div
+              className="w-5 h-5 rounded-full"
+              style={{ backgroundColor: highlightedNodeColor.fill, border: `2px solid ${highlightedNodeColor.stroke}` }}
+            ></div>
+            <span className="font-medium">{highlightedNodeLabel}</span>
           </div>
         )}
       </div>
